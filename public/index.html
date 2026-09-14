@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>TableOne — QR Ordering</title>
+
+  <link rel="stylesheet" href="/style.css">
+</head>
+
+<body>
+
+  <!-- HEADER -->
+
+  <header class="topbar">
+
+    <a
+      href="#"
+      class="brand"
+      onclick="showCustomer(); return false;"
+    >
+      <span>TABLE</span>ONE
+    </a>
+
+    <nav>
+
+      <button onclick="showCustomer()">
+        Menu
+      </button>
+
+      <button onclick="showDashboard()">
+        Kitchen
+      </button>
+
+      <button onclick="showQR()">
+        QR Tables
+      </button>
+
+    </nav>
+
+  </header>
+
+
+  <main>
+
+
+    <!-- CUSTOMER -->
+
+    <section id="customer">
+
+      <div class="hero">
+
+        <div class="pill">
+          QR TABLE ORDERING
+        </div>
+
+        <h1>
+          Good food.<br>
+          <span>Zero waiting.</span>
+        </h1>
+
+        <p>
+          Scan the QR on your table,
+          choose your food and send
+          the order straight to the kitchen.
+        </p>
+
+      </div>
+
+
+      <!-- TABLE -->
+
+      <div class="table-card">
+
+        <div>
+
+          <small>
+            YOUR TABLE
+          </small>
+
+          <strong id="tableLabel">
+            Table —
+          </strong>
+
+        </div>
+
+        <div
+          id="tableStatus"
+          class="ok"
+        >
+          Demo mode
+        </div>
+
+      </div>
+
+
+      <!-- MENU -->
+
+      <div id="menu"></div>
+
+
+      <!-- CART -->
+
+      <div class="cart-panel">
+
+        <div class="cart-head">
+
+          <div>
+
+            <small>
+              YOUR ORDER
+            </small>
+
+            <h2>
+              Cart
+            </h2>
+
+          </div>
+
+          <span id="cartCount">
+            0 items
+          </span>
+
+        </div>
+
+
+        <div id="cartItems">
+          Your cart is empty.
+        </div>
+
+
+        <textarea
+          id="note"
+          placeholder="Special note (optional)"
+        ></textarea>
+
+
+        <div class="cart-total">
+
+          <strong>
+            Total
+          </strong>
+
+          <strong>
+            ₹<span id="total">0</span>
+          </strong>
+
+        </div>
+
+
+        <button
+          class="checkout"
+          onclick="placeOrder()"
+        >
+          Send order to kitchen →
+        </button>
+
+      </div>
+
+    </section>
+
+
+
+    <!-- KITCHEN -->
+
+    <section
+      id="dashboard"
+      class="hidden"
+    >
+
+      <div class="section-title">
+
+        <div>
+
+          <div class="pill">
+            STAFF
+          </div>
+
+          <h1>
+            Kitchen orders
+          </h1>
+
+          <p>
+            Manage incoming restaurant orders.
+          </p>
+
+        </div>
+
+        <button
+          class="refresh"
+          onclick="loadOrders()"
+        >
+          Refresh
+        </button>
+
+      </div>
+
+
+      <div id="orders"></div>
+
+    </section>
+
+
+
+    <!-- QR -->
+
+    <section
+      id="qr"
+      class="hidden"
+    >
+
+      <div class="section-title">
+
+        <div>
+
+          <div class="pill">
+            PRINTABLE
+          </div>
+
+          <h1>
+            Table QR codes
+          </h1>
+
+          <p>
+            Generate QR codes for restaurant tables.
+          </p>
+
+        </div>
+
+        <button
+          class="refresh"
+          onclick="window.print()"
+        >
+          Print
+        </button>
+
+      </div>
+
+
+      <div
+        class="qr-grid"
+        id="qrGrid"
+      ></div>
+
+    </section>
+
+  </main>
+
+
+<div id="toast"></div>
+
+<script src="/app.js?v=2"></script>
+
+</body>
+</html>
+

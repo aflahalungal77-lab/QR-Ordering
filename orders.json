@@ -1,0 +1,19 @@
+[
+  {
+    "id": 1001,
+    "table": "1",
+    "items": [
+      {
+        "id": 1,
+        "name": "Chicken Biriyani",
+        "price": 160,
+        "quantity": 1
+      }
+    ],
+    "total": 160,
+    "note": "",
+    "status": "NEW",
+    "createdAt": "2026-09-14T12:51:58.811Z",
+    "updatedAt": "2026-09-14T12:51:58.811Z"
+  }
+]
