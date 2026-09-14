@@ -2,71 +2,116 @@ let menu = [];
 let cart = [];
 
 
-// GET TABLE FROM QR URL
+// ======================================
+// URL
+// ======================================
 
-const params = new URLSearchParams(
-  window.location.search
-);
+const params =
+  new URLSearchParams(
+    window.location.search
+  );
 
-let table = params.get("table");
+let table =
+  params.get("table");
 
 
+// ======================================
 // TOAST
+// ======================================
 
 function toast(message) {
+
   const element =
     document.getElementById("toast");
 
-  element.textContent = message;
+  element.textContent =
+    message;
 
-  element.style.display = "block";
+  element.style.display =
+    "block";
 
   setTimeout(() => {
-    element.style.display = "none";
+
+    element.style.display =
+      "none";
+
   }, 2200);
 }
 
 
+// ======================================
 // LOAD MENU
+// ======================================
 
 async function loadMenu() {
 
-  const response =
-    await fetch("/api/menu");
+  try {
 
-  menu = await response.json();
+    const response =
+      await fetch("/api/menu");
+
+    if (!response.ok) {
+      throw new Error("Failed to load menu");
+    }
+
+    menu =
+      await response.json();
 
 
-  // QR DETECTED
+    // TABLE
 
-  if (table) {
+    if (table) {
 
-    document.getElementById(
-      "tableLabel"
-    ).textContent = `Table ${table}`;
+      document.getElementById(
+        "tableLabel"
+      ).textContent =
+        `Table ${table}`;
 
-    document.getElementById(
-      "tableStatus"
-    ).textContent = "QR detected";
+      document.getElementById(
+        "headerTable"
+      ).textContent =
+        `Table ${table}`;
 
-  } else {
+      document.getElementById(
+        "tableStatus"
+      ).textContent =
+        "QR detected";
 
-    document.getElementById(
-      "tableLabel"
-    ).textContent = "Demo mode";
+    } else {
 
+      document.getElementById(
+        "tableLabel"
+      ).textContent =
+        "Demo mode";
+
+      document.getElementById(
+        "headerTable"
+      ).textContent =
+        "Demo mode";
+    }
+
+
+    renderMenu();
+
+    renderCart();
+
+  } catch (error) {
+
+    console.error(
+      "Menu error:",
+      error
+    );
+
+    toast(
+      "Failed to load menu"
+    );
   }
-
-
-  renderMenu();
-
-  renderCart();
 }
 
 
+// ======================================
 // RENDER MENU
-
-// RENDER MENU
+// ======================================
 
 function renderMenu() {
 
@@ -118,12 +163,18 @@ function renderMenu() {
 
     `).join("");
 }
+
+
+// ======================================
 // ADD TO CART
+// ======================================
 
 function addToCart(id) {
 
   const existing =
-    cart.find(item => item.id === id);
+    cart.find(
+      item => item.id === id
+    );
 
 
   if (existing) {
@@ -139,18 +190,26 @@ function addToCart(id) {
 
   }
 
+
   renderCart();
 
   toast("Added to order");
 }
 
 
+// ======================================
 // CHANGE QUANTITY
+// ======================================
 
-function changeQuantity(id, amount) {
+function changeQuantity(
+  id,
+  amount
+) {
 
   const item =
-    cart.find(item => item.id === id);
+    cart.find(
+      item => item.id === id
+    );
 
   if (!item) return;
 
@@ -161,7 +220,9 @@ function changeQuantity(id, amount) {
   if (item.quantity <= 0) {
 
     cart =
-      cart.filter(item => item.id !== id);
+      cart.filter(
+        item => item.id !== id
+      );
 
   }
 
@@ -170,18 +231,26 @@ function changeQuantity(id, amount) {
 }
 
 
+// ======================================
 // RENDER CART
+// ======================================
 
 function renderCart() {
 
   const cartElement =
-    document.getElementById("cartItems");
+    document.getElementById(
+      "cartItems"
+    );
 
   const totalElement =
-    document.getElementById("total");
+    document.getElementById(
+      "total"
+    );
 
   const countElement =
-    document.getElementById("cartCount");
+    document.getElementById(
+      "floatingCartCount"
+    );
 
 
   if (!cart.length) {
@@ -189,10 +258,11 @@ function renderCart() {
     cartElement.textContent =
       "Your cart is empty.";
 
-    totalElement.textContent = "0";
+    totalElement.textContent =
+      "0";
 
     countElement.textContent =
-      "0 items";
+      "0";
 
     return;
   }
@@ -208,11 +278,17 @@ function renderCart() {
 
       const product =
         menu.find(
-          product => product.id === item.id
+          product =>
+            product.id === item.id
         );
 
+
+      if (!product) return "";
+
+
       const subtotal =
-        product.price * item.quantity;
+        product.price *
+        item.quantity;
 
 
       total += subtotal;
@@ -264,14 +340,64 @@ function renderCart() {
     }).join("");
 
 
-  totalElement.textContent = total;
+  totalElement.textContent =
+    total;
 
   countElement.textContent =
-    `${count} item${count === 1 ? "" : "s"}`;
+    count;
 }
 
 
+// ======================================
+// OPEN CART
+// ======================================
+
+function openCart() {
+
+  document
+    .getElementById("cartOverlay")
+    .classList.add("open");
+
+  document.body.style.overflow =
+    "hidden";
+}
+
+
+// ======================================
+// CLOSE CART
+// ======================================
+
+function closeCart() {
+
+  document
+    .getElementById("cartOverlay")
+    .classList.remove("open");
+
+  document.body.style.overflow =
+    "";
+}
+
+
+// ======================================
+// CLOSE OVERLAY
+// ======================================
+
+function closeCartOnOverlay(event) {
+
+  if (
+    event.target.id ===
+    "cartOverlay"
+  ) {
+
+    closeCart();
+
+  }
+}
+
+
+// ======================================
 // PLACE ORDER
+// ======================================
 
 async function placeOrder() {
 
@@ -284,7 +410,7 @@ async function placeOrder() {
   }
 
 
-  // If user didn't come through QR
+  // Demo mode without QR
 
   if (!table) {
 
@@ -293,16 +419,39 @@ async function placeOrder() {
         "Enter table number for demo:"
       );
 
-    if (!enteredTable) return;
+    if (!enteredTable) {
+      return;
+    }
 
-    table = enteredTable;
+    table =
+      enteredTable.trim();
+
 
     history.replaceState(
       null,
       "",
-      `?table=${encodeURIComponent(table)}`
+      `?table=${encodeURIComponent(
+        table
+      )}`
     );
 
+
+    document.getElementById(
+      "tableLabel"
+    ).textContent =
+      `Table ${table}`;
+
+
+    document.getElementById(
+      "headerTable"
+    ).textContent =
+      `Table ${table}`;
+
+
+    document.getElementById(
+      "tableStatus"
+    ).textContent =
+      "Table selected";
   }
 
 
@@ -312,197 +461,394 @@ async function placeOrder() {
     ).value;
 
 
-  const response =
-    await fetch("/api/orders", {
+  try {
 
-      method: "POST",
+    const response =
+      await fetch(
+        "/api/orders",
+        {
+          method: "POST",
 
-      headers: {
-        "Content-Type":
-          "application/json"
-      },
+          headers: {
+            "Content-Type":
+              "application/json"
+          },
 
-      body: JSON.stringify({
-        table,
-        items: cart,
-        note
-      })
-
-    });
-
-
-  const order =
-    await response.json();
+          body: JSON.stringify({
+            table,
+            items: cart,
+            note
+          })
+        }
+      );
 
 
-  if (!response.ok) {
+    const order =
+      await response.json();
 
-    return toast(
-      order.error ||
-      "Order failed"
+
+    if (!response.ok) {
+
+      return toast(
+        order.error ||
+        "Order failed"
+      );
+
+    }
+
+
+    // SUCCESS
+
+    closeCart();
+
+
+    document.getElementById(
+      "successOrderId"
+    ).textContent =
+      `#${order.id}`;
+
+
+    document
+      .getElementById(
+        "successOverlay"
+      )
+      .classList.add("open");
+
+
+    cart = [];
+
+
+    document.getElementById(
+      "note"
+    ).value = "";
+
+
+    renderCart();
+
+  } catch (error) {
+
+    console.error(
+      "Order error:",
+      error
+    );
+
+    toast(
+      "Unable to send order"
+    );
+  }
+}
+
+
+// ======================================
+// CLOSE SUCCESS
+// ======================================
+
+function closeSuccess() {
+
+  document
+    .getElementById(
+      "successOverlay"
+    )
+    .classList.remove("open");
+}
+
+
+// ======================================
+// ADMIN ROUTING
+// ======================================
+
+function isAdminPage() {
+
+  return (
+    window.location.pathname ===
+    "/admin"
+  );
+
+}
+
+
+// ======================================
+// SHOW ADMIN
+// ======================================
+
+function showAdmin() {
+
+  document
+    .getElementById("customer")
+    .classList.add("hidden");
+
+
+  document
+    .getElementById("admin")
+    .classList.remove("hidden");
+
+
+  document
+    .getElementById("cartButton")
+    .classList.add("hidden");
+
+
+  if (
+    !window.location.pathname.includes(
+      "/admin"
+    )
+  ) {
+
+    history.replaceState(
+      null,
+      "",
+      "/admin"
     );
 
   }
 
 
-  toast(
-    `Order #${order.id} sent to kitchen`
-  );
-
-
-  cart = [];
-
-  document.getElementById(
-    "note"
-  ).value = "";
-
-
-  renderCart();
+  showAdminKitchen();
 }
 
 
-// LOAD KITCHEN ORDERS
+// ======================================
+// ADMIN KITCHEN
+// ======================================
 
-async function loadOrders() {
+function showAdminKitchen() {
 
-  const response =
-    await fetch("/api/orders");
-
-  const orders =
-    await response.json();
-
-
-  const ordersElement =
-    document.getElementById("orders");
+  document
+    .getElementById("adminKitchen")
+    .classList.remove("hidden");
 
 
-  if (!orders.length) {
-
-    ordersElement.innerHTML =
-      "<p>No orders yet.</p>";
-
-    return;
-
-  }
-
-
-  ordersElement.innerHTML =
-    orders.map(order => `
-
-      <article class="order">
-
-        <div class="order-head">
-
-          <div>
-
-            <strong>
-              #${order.id}
-            </strong>
-
-            <div>
-              Table ${order.table}
-            </div>
-
-          </div>
-
-          <span class="status">
-            ${order.status}
-          </span>
-
-        </div>
-
-
-        <ul>
-
-          ${order.items.map(item => `
-
-            <li>
-              ${item.name}
-              × ${item.quantity}
-              — ₹${item.price * item.quantity}
-            </li>
-
-          `).join("")}
-
-        </ul>
-
-
-        ${
-          order.note
-            ? `<p>
-                <b>Note:</b>
-                ${escapeHTML(order.note)}
-               </p>`
-            : ""
-        }
-
-
-        <div class="order-total">
-          Total ₹${order.total}
-        </div>
-
-
-        <div class="status-buttons">
-
-          ${[
-            "NEW",
-            "PREPARING",
-            "READY",
-            "SERVED",
-            "CANCELLED"
-          ].map(status => `
-
-            <button
-              onclick="
-                updateOrderStatus(
-                  ${order.id},
-                  '${status}'
-                )
-              "
-            >
-              ${status}
-            </button>
-
-          `).join("")}
-
-        </div>
-
-      </article>
-
-    `).join("");
-}
-
-
-// UPDATE STATUS
-
-async function updateOrderStatus(
-  id,
-  status
-) {
-
-  await fetch(
-    `/api/orders/${id}`,
-
-    {
-      method: "PATCH",
-
-      headers: {
-        "Content-Type":
-          "application/json"
-      },
-
-      body: JSON.stringify({
-        status
-      })
-    }
-  );
+  document
+    .getElementById("adminQR")
+    .classList.add("hidden");
 
 
   loadOrders();
 }
 
 
+// ======================================
+// ADMIN QR
+// ======================================
+
+function showAdminQR() {
+
+  document
+    .getElementById("adminKitchen")
+    .classList.add("hidden");
+
+
+  document
+    .getElementById("adminQR")
+    .classList.remove("hidden");
+
+
+  generateQRs();
+}
+
+
+// ======================================
+// LOAD ORDERS
+// ======================================
+
+async function loadOrders() {
+
+  try {
+
+    const response =
+      await fetch(
+        "/api/orders"
+      );
+
+
+    if (!response.ok) {
+      throw new Error(
+        "Failed to load orders"
+      );
+    }
+
+
+    const orders =
+      await response.json();
+
+
+    const ordersElement =
+      document.getElementById(
+        "orders"
+      );
+
+
+    if (!orders.length) {
+
+      ordersElement.innerHTML =
+        "<p>No orders yet.</p>";
+
+      return;
+    }
+
+
+    ordersElement.innerHTML =
+      orders.map(order => `
+
+        <article class="order">
+
+          <div class="order-head">
+
+            <div>
+
+              <strong>
+                #${order.id}
+              </strong>
+
+              <div>
+                Table ${order.table}
+              </div>
+
+            </div>
+
+            <span class="status">
+              ${order.status}
+            </span>
+
+          </div>
+
+
+          <ul>
+
+            ${order.items.map(item => `
+
+              <li>
+                ${item.name}
+                × ${item.quantity}
+                — ₹${item.price * item.quantity}
+              </li>
+
+            `).join("")}
+
+          </ul>
+
+
+          ${
+            order.note
+              ? `<p>
+                  <b>Note:</b>
+                  ${escapeHTML(
+                    order.note
+                  )}
+                 </p>`
+              : ""
+          }
+
+
+          <div class="order-total">
+            Total ₹${order.total}
+          </div>
+
+
+          <div class="status-buttons">
+
+            ${[
+              "NEW",
+              "PREPARING",
+              "READY",
+              "SERVED",
+              "CANCELLED"
+            ].map(status => `
+
+              <button
+                onclick="
+                  updateOrderStatus(
+                    ${order.id},
+                    '${status}'
+                  )
+                "
+              >
+                ${status}
+              </button>
+
+            `).join("")}
+
+          </div>
+
+        </article>
+
+      `).join("");
+
+  } catch (error) {
+
+    console.error(
+      "Orders error:",
+      error
+    );
+
+    document.getElementById(
+      "orders"
+    ).innerHTML =
+      "<p>Failed to load orders.</p>";
+  }
+}
+
+
+// ======================================
+// UPDATE STATUS
+// ======================================
+
+async function updateOrderStatus(
+  id,
+  status
+) {
+
+  try {
+
+    const response =
+      await fetch(
+        `/api/orders/${id}`,
+        {
+          method: "PATCH",
+
+          headers: {
+            "Content-Type":
+              "application/json"
+          },
+
+          body: JSON.stringify({
+            status
+          })
+        }
+      );
+
+
+    if (!response.ok) {
+
+      const data =
+        await response.json();
+
+      return toast(
+        data.error ||
+        "Failed to update order"
+      );
+    }
+
+
+    loadOrders();
+
+  } catch (error) {
+
+    console.error(
+      "Status error:",
+      error
+    );
+
+    toast(
+      "Failed to update status"
+    );
+  }
+}
+
+
+// ======================================
 // ESCAPE HTML
+// ======================================
 
 function escapeHTML(value) {
 
@@ -520,73 +866,9 @@ function escapeHTML(value) {
 }
 
 
-// CUSTOMER
-
-function showCustomer() {
-
-  document
-    .getElementById("customer")
-    .classList.remove("hidden");
-
-
-  document
-    .getElementById("dashboard")
-    .classList.add("hidden");
-
-
-  document
-    .getElementById("qr")
-    .classList.add("hidden");
-}
-
-
-// KITCHEN
-
-function showDashboard() {
-
-  document
-    .getElementById("customer")
-    .classList.add("hidden");
-
-
-  document
-    .getElementById("dashboard")
-    .classList.remove("hidden");
-
-
-  document
-    .getElementById("qr")
-    .classList.add("hidden");
-
-
-  loadOrders();
-}
-
-
-// QR PAGE
-
-function showQR() {
-
-  document
-    .getElementById("customer")
-    .classList.add("hidden");
-
-
-  document
-    .getElementById("dashboard")
-    .classList.add("hidden");
-
-
-  document
-    .getElementById("qr")
-    .classList.remove("hidden");
-
-
-  generateQRs();
-}
-
-
-// GENERATE QR CODES
+// ======================================
+// GENERATE QR
+// ======================================
 
 function generateQRs() {
 
@@ -614,7 +896,9 @@ function generateQRs() {
 
 
         const qrURL =
-          `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(orderURL)}`;
+          `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(
+            orderURL
+          )}`;
 
 
         return `
@@ -647,25 +931,32 @@ function generateQRs() {
 }
 
 
+// ======================================
 // INITIALIZE
+// ======================================
 
-loadMenu();
+if (isAdminPage()) {
+
+  showAdmin();
+
+} else {
+
+  loadMenu();
+
+}
 
 
-// REFRESH KITCHEN EVERY 3 SEC
+// ======================================
+// AUTO REFRESH ADMIN
+// ======================================
 
 setInterval(() => {
 
-  const dashboard =
-    document.getElementById(
-      "dashboard"
-    );
-
-
   if (
-    !dashboard.classList.contains(
-      "hidden"
-    )
+    isAdminPage() &&
+    !document
+      .getElementById("adminKitchen")
+      .classList.contains("hidden")
   ) {
 
     loadOrders();

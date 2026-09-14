@@ -4,37 +4,50 @@
 
 body {
   margin: 0;
+
   background: #f4f3ee;
+
   color: #111;
-  font-family: Arial, sans-serif;
+
+  font-family:
+    Arial,
+    sans-serif;
 }
 
 
-/* HEADER */
+/* ======================================
+   HEADER
+====================================== */
 
 .topbar {
   height: 72px;
 
   background: #0b0b0b;
+
   color: white;
 
   display: flex;
+
   align-items: center;
+
   justify-content: space-between;
 
   padding: 0 6%;
 
   position: sticky;
+
   top: 0;
 
-  z-index: 10;
+  z-index: 50;
 }
 
 .brand {
   color: white;
+
   text-decoration: none;
 
   font-size: 21px;
+
   font-weight: 900;
 
   letter-spacing: -1px;
@@ -44,34 +57,35 @@ body {
   font-weight: 400;
 }
 
-.topbar nav button {
-  border: 0;
-  background: transparent;
+.table-mini {
+  font-size: 12px;
 
   color: #aaa;
 
-  margin-left: 8px;
+  border: 1px solid #333;
 
-  cursor: pointer;
+  padding: 8px 12px;
+
+  border-radius: 99px;
 }
 
-.topbar nav button:hover {
-  color: white;
-}
 
-
-/* MAIN */
+/* ======================================
+   MAIN
+====================================== */
 
 main {
   max-width: 1080px;
 
   margin: auto;
 
-  padding: 50px 22px 100px;
+  padding: 50px 22px 140px;
 }
 
 
-/* HERO */
+/* ======================================
+   HERO
+====================================== */
 
 .hero {
   max-width: 700px;
@@ -117,7 +131,9 @@ main {
 }
 
 
-/* TABLE */
+/* ======================================
+   TABLE
+====================================== */
 
 .table-card {
   display: flex;
@@ -168,7 +184,9 @@ main {
 }
 
 
-/* MENU */
+/* ======================================
+   MENU
+====================================== */
 
 #menu {
   display: grid;
@@ -186,7 +204,7 @@ main {
 
   border-radius: 18px;
 
-  padding: 20px;
+  overflow: hidden;
 
   transition: .2s;
 }
@@ -198,12 +216,34 @@ main {
     0 12px 35px #00000010;
 }
 
-.food .emoji {
-  font-size: 40px;
+.food-image {
+  width: 100%;
+
+  height: 190px;
+
+  display: block;
+
+  object-fit: cover;
+}
+
+.food-content {
+  padding: 18px;
+}
+
+.category {
+  font-size: 10px;
+
+  letter-spacing: 1.5px;
+
+  text-transform: uppercase;
+
+  color: #888;
+
+  font-weight: 700;
 }
 
 .food h3 {
-  margin: 15px 0 5px;
+  margin: 8px 0 5px;
 
   font-size: 19px;
 }
@@ -218,6 +258,20 @@ main {
   min-height: 32px;
 }
 
+.food-bottom {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 12px;
+}
+
+.food-bottom strong {
+  font-size: 18px;
+}
+
 .food button,
 .checkout {
   border: 0;
@@ -228,67 +282,198 @@ main {
 
   color: white;
 
-  padding: 12px;
-
-  width: 100%;
+  padding: 12px 16px;
 
   font-weight: 800;
 
   cursor: pointer;
 }
 
+.food button:hover,
+.checkout:hover {
+  opacity: .85;
+}
 
-/* CART */
 
-.cart-panel {
-  margin-top: 30px;
+/* ======================================
+   FLOATING CART
+====================================== */
+
+.cart-floating {
+  position: fixed;
+
+  right: 24px;
+
+  bottom: 24px;
+
+  z-index: 100;
+
+  border: 0;
+
+  background: #111;
+
+  color: white;
+
+  border-radius: 99px;
+
+  padding: 14px 18px;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 9px;
+
+  font-weight: 800;
+
+  box-shadow:
+    0 12px 35px #00000025;
+
+  cursor: pointer;
+
+  transition: .2s;
+}
+
+.cart-floating:hover {
+  transform: translateY(-2px);
+}
+
+.cart-icon {
+  font-size: 18px;
+}
+
+.cart-floating b {
+  min-width: 22px;
+
+  height: 22px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
 
   background: white;
 
-  border: 1px solid #ddd;
+  color: #111;
 
-  border-radius: 20px;
+  border-radius: 50%;
 
-  padding: 22px;
-
-  box-shadow:
-    0 12px 40px #0000000d;
+  font-size: 11px;
 }
 
-.cart-head {
+
+/* ======================================
+   CART OVERLAY
+====================================== */
+
+.cart-overlay {
+  position: fixed;
+
+  inset: 0;
+
+  background: #00000066;
+
+  z-index: 200;
+
+  display: none;
+
+  align-items: flex-end;
+
+  justify-content: center;
+}
+
+.cart-overlay.open {
   display: flex;
+}
+
+.cart-modal {
+  width: min(600px, 100%);
+
+  max-height: 88vh;
+
+  overflow-y: auto;
+
+  background: white;
+
+  border-radius: 24px 24px 0 0;
+
+  padding: 24px;
+
+  animation: cartUp .2s ease;
+}
+
+@keyframes cartUp {
+
+  from {
+    transform: translateY(100%);
+  }
+
+  to {
+    transform: translateY(0);
+  }
+
+}
+
+.cart-modal-head {
+  display: flex;
+
+  align-items: flex-start;
 
   justify-content: space-between;
 
-  align-items: center;
+  margin-bottom: 15px;
 }
 
-.cart-head small {
+.cart-modal-head small {
   color: #777;
 
   letter-spacing: 2px;
 }
 
-.cart-head h2 {
-  margin: 4px 0 15px;
+.cart-modal-head h2 {
+  margin: 4px 0 0;
+
+  font-size: 28px;
 }
 
-.cart-head span {
-  font-size: 12px;
+.close-cart {
+  border: 0;
 
-  color: #777;
+  background: #eee;
+
+  width: 36px;
+
+  height: 36px;
+
+  border-radius: 50%;
+
+  font-size: 24px;
+
+  cursor: pointer;
 }
+
+
+/* ======================================
+   CART ITEMS
+====================================== */
 
 .cart-row {
   display: flex;
 
   justify-content: space-between;
 
+  align-items: center;
+
   gap: 12px;
 
-  padding: 13px 0;
+  padding: 14px 0;
 
   border-top: 1px solid #eee;
+}
+
+.qty {
+  margin-left: 8px;
 }
 
 .qty button {
@@ -301,12 +486,14 @@ main {
   padding: 3px 8px;
 
   margin-left: 3px;
+
+  cursor: pointer;
 }
 
-.cart-panel textarea {
+.cart-modal textarea {
   width: 100%;
 
-  margin-top: 12px;
+  margin-top: 15px;
 
   border: 1px solid #ddd;
 
@@ -317,6 +504,8 @@ main {
   min-height: 70px;
 
   resize: vertical;
+
+  font: inherit;
 }
 
 .cart-total {
@@ -324,13 +513,141 @@ main {
 
   justify-content: space-between;
 
-  font-size: 18px;
+  font-size: 19px;
 
   padding: 18px 0;
 }
 
+.checkout {
+  width: 100%;
 
-/* DASHBOARD */
+  padding: 15px;
+}
+
+
+/* ======================================
+   SUCCESS
+====================================== */
+
+.success-overlay {
+  position: fixed;
+
+  inset: 0;
+
+  background: #00000066;
+
+  z-index: 300;
+
+  display: none;
+
+  align-items: center;
+
+  justify-content: center;
+
+  padding: 20px;
+}
+
+.success-overlay.open {
+  display: flex;
+}
+
+.success-card {
+  width: min(440px, 100%);
+
+  background: white;
+
+  border-radius: 24px;
+
+  padding: 35px;
+
+  text-align: center;
+}
+
+.success-icon {
+  width: 55px;
+
+  height: 55px;
+
+  margin: 0 auto 20px;
+
+  border-radius: 50%;
+
+  background: #111;
+
+  color: white;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  font-size: 25px;
+}
+
+.success-card h2 {
+  font-size: 30px;
+
+  letter-spacing: -1px;
+}
+
+.success-card p {
+  color: #777;
+
+  line-height: 1.6;
+
+  margin-bottom: 25px;
+}
+
+
+/* ======================================
+   ADMIN
+====================================== */
+
+.admin-nav {
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+  margin-bottom: 45px;
+
+  padding-bottom: 18px;
+
+  border-bottom: 1px solid #ddd;
+}
+
+.admin-nav a {
+  color: #555;
+
+  text-decoration: none;
+
+  margin-right: auto;
+}
+
+.admin-nav strong {
+  margin-right: 10px;
+}
+
+.admin-nav button {
+  border: 0;
+
+  background: #111;
+
+  color: white;
+
+  border-radius: 8px;
+
+  padding: 9px 12px;
+
+  cursor: pointer;
+}
+
+
+/* ======================================
+   SECTION
+====================================== */
 
 .section-title {
   display: flex;
@@ -361,6 +678,11 @@ main {
 
   cursor: pointer;
 }
+
+
+/* ======================================
+   ORDERS
+====================================== */
 
 .order {
   background: white;
@@ -413,7 +735,7 @@ main {
 
   padding: 8px 10px;
 
-  margin: 4px 4px 0 0;
+  margin: 12px 4px 0 0;
 
   background: #eee;
 
@@ -425,7 +747,9 @@ main {
 }
 
 
-/* QR */
+/* ======================================
+   QR
+====================================== */
 
 .qr-grid {
   display: grid;
@@ -469,11 +793,18 @@ main {
 }
 
 
-/* UTIL */
+/* ======================================
+   UTIL
+====================================== */
 
 .hidden {
   display: none !important;
 }
+
+
+/* ======================================
+   TOAST
+====================================== */
 
 #toast {
   position: fixed;
@@ -494,11 +825,13 @@ main {
 
   display: none;
 
-  z-index: 20;
+  z-index: 500;
 }
 
 
-/* MOBILE */
+/* ======================================
+   MOBILE
+====================================== */
 
 @media (max-width: 650px) {
 
@@ -506,10 +839,8 @@ main {
     padding: 0 18px;
   }
 
-  .topbar nav button {
-    font-size: 11px;
-
-    padding: 7px 4px;
+  main {
+    padding: 35px 16px 120px;
   }
 
   .hero h1,
@@ -521,20 +852,50 @@ main {
     padding: 17px;
   }
 
+  .cart-floating {
+    right: 16px;
+
+    bottom: 16px;
+  }
+
+  .admin-nav {
+    flex-wrap: wrap;
+  }
+
+  .admin-nav a {
+    width: 100%;
+
+    margin-bottom: 8px;
+  }
+
+  .section-title {
+    align-items: flex-start;
+
+    gap: 15px;
+  }
+
+  .section-title h1 {
+    font-size: 45px;
+  }
+
   .qr-grid {
     grid-template-columns: 1fr;
   }
+
 }
 
 
-/* PRINT QR */
+/* ======================================
+   PRINT QR
+====================================== */
 
 @media print {
 
   .topbar,
   #customer,
-  #dashboard,
-  .section-title button {
+  .admin-nav,
+  .section-title button,
+  #adminKitchen {
     display: none !important;
   }
 
@@ -543,58 +904,12 @@ main {
   }
 
   .qr-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns:
+      repeat(2, 1fr);
   }
 
   .qr-card {
     break-inside: avoid;
   }
-}
 
-.food {
-  overflow: hidden;
-  padding: 0;
-}
-
-.food-image {
-  width: 100%;
-  height: 190px;
-  display: block;
-  object-fit: cover;
-}
-
-.food-content {
-  padding: 18px;
-}
-
-.category {
-  font-size: 10px;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  color: #888;
-  font-weight: 700;
-}
-
-.food h3 {
-  margin: 8px 0 5px;
-}
-
-.food p {
-  min-height: auto;
-}
-
-.food-bottom {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.food-bottom strong {
-  font-size: 18px;
-}
-
-.food-bottom button {
-  width: auto;
-  padding: 10px 15px;
 }

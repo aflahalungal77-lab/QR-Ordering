@@ -1,10 +1,7 @@
 const express = require("express");
 const path = require("path");
-const fs = require("fs");
 
 const app = express();
-const PORT = 3000;
-
 
 // ========================================
 // MIDDLEWARE
@@ -18,104 +15,14 @@ app.use(express.static(path.join(__dirname, "public")));
 // ORDER STORAGE
 // ========================================
 
-const ordersFile = path.join(
-  __dirname,
-  "orders.json"
-);
+// DEMO ONLY
+// Orders are stored in memory.
+// They can disappear when the serverless
+// instance restarts/redeploys.
 
+let orders = [];
 
-// Create orders.json if it doesn't exist
-function createOrdersFile() {
-  if (!fs.existsSync(ordersFile)) {
-    fs.writeFileSync(
-      ordersFile,
-      "[]",
-      "utf8"
-    );
-
-    console.log("Created orders.json");
-  }
-}
-
-
-// Load orders from file
-function loadOrders() {
-  try {
-    createOrdersFile();
-
-    const data = fs.readFileSync(
-      ordersFile,
-      "utf8"
-    );
-
-    const parsed = JSON.parse(data);
-
-    if (!Array.isArray(parsed)) {
-      console.error(
-        "orders.json is invalid. Starting with empty orders."
-      );
-
-      return [];
-    }
-
-    return parsed;
-
-  } catch (error) {
-
-    console.error(
-      "Failed to load orders:",
-      error
-    );
-
-    return [];
-  }
-}
-
-
-// Save orders to file
-function saveOrders() {
-  try {
-
-    fs.writeFileSync(
-      ordersFile,
-      JSON.stringify(orders, null, 2),
-      "utf8"
-    );
-
-  } catch (error) {
-
-    console.error(
-      "Failed to save orders:",
-      error
-    );
-
-    throw error;
-  }
-}
-
-
-// Load existing orders when server starts
-let orders = loadOrders();
-
-
-// Calculate next order ID
-let nextOrderId =
-  orders.length > 0
-    ? Math.max(
-        ...orders.map(
-          (order) => Number(order.id) || 0
-        )
-      ) + 1
-    : 1001;
-
-
-console.log(
-  `Loaded ${orders.length} existing order(s)`
-);
-
-console.log(
-  `Next order ID: ${nextOrderId}`
-);
+let nextOrderId = 1001;
 
 
 // ========================================
@@ -190,9 +97,7 @@ const menu = [
 // ========================================
 
 app.get("/api/menu", (req, res) => {
-
   res.json(menu);
-
 });
 
 
@@ -201,9 +106,7 @@ app.get("/api/menu", (req, res) => {
 // ========================================
 
 app.get("/api/orders", (req, res) => {
-
   res.json(orders);
-
 });
 
 
@@ -212,9 +115,7 @@ app.get("/api/orders", (req, res) => {
 // ========================================
 
 app.post("/api/orders", (req, res) => {
-
   try {
-
     const {
       table,
       items,
@@ -222,34 +123,39 @@ app.post("/api/orders", (req, res) => {
     } = req.body;
 
 
+    // ------------------------------------
     // Validate table
+    // ------------------------------------
+
     if (
       table === undefined ||
       table === null ||
       String(table).trim() === ""
     ) {
-
       return res.status(400).json({
         error: "Table number is required"
       });
-
     }
 
 
+    // ------------------------------------
     // Validate items
+    // ------------------------------------
+
     if (
       !Array.isArray(items) ||
       items.length === 0
     ) {
-
       return res.status(400).json({
         error: "Order must contain items"
       });
-
     }
 
 
+    // ------------------------------------
     // Clean items using server-side menu
+    // ------------------------------------
+
     const cleanItems = items
       .map((item) => {
 
@@ -297,17 +203,21 @@ app.post("/api/orders", (req, res) => {
       .filter(Boolean);
 
 
-    // No valid items
-    if (!cleanItems.length) {
+    // ------------------------------------
+    // Make sure valid items exist
+    // ------------------------------------
 
+    if (!cleanItems.length) {
       return res.status(400).json({
         error: "No valid items"
       });
-
     }
 
 
+    // ------------------------------------
     // Calculate total on SERVER
+    // ------------------------------------
+
     const total =
       cleanItems.reduce(
         (sum, item) =>
@@ -318,15 +228,22 @@ app.post("/api/orders", (req, res) => {
       );
 
 
+    // ------------------------------------
     // Create order
-    const order = {
+    // ------------------------------------
 
+    const now =
+      new Date().toISOString();
+
+
+    const order = {
       id: nextOrderId++,
 
       table:
         String(table).trim(),
 
-      items: cleanItems,
+      items:
+        cleanItems,
 
       total,
 
@@ -335,23 +252,22 @@ app.post("/api/orders", (req, res) => {
           .trim()
           .slice(0, 500),
 
-      status: "NEW",
+      status:
+        "NEW",
 
       createdAt:
-        new Date().toISOString(),
+        now,
 
       updatedAt:
-        new Date().toISOString()
-
+        now
     };
 
 
+    // ------------------------------------
     // Add newest order first
+    // ------------------------------------
+
     orders.unshift(order);
-
-
-    // SAVE TO DISK
-    saveOrders();
 
 
     console.log(
@@ -359,8 +275,11 @@ app.post("/api/orders", (req, res) => {
     );
 
 
-    res.status(201).json(order);
+    // ------------------------------------
+    // Send response
+    // ------------------------------------
 
+    return res.status(201).json(order);
 
   } catch (error) {
 
@@ -369,12 +288,10 @@ app.post("/api/orders", (req, res) => {
       error
     );
 
-    res.status(500).json({
+    return res.status(500).json({
       error: "Failed to create order"
     });
-
   }
-
 });
 
 
@@ -392,6 +309,10 @@ app.patch(
         Number(req.params.id);
 
 
+      // ----------------------------------
+      // Validate ID
+      // ----------------------------------
+
       if (!Number.isInteger(id)) {
 
         return res.status(400).json({
@@ -400,6 +321,10 @@ app.patch(
 
       }
 
+
+      // ----------------------------------
+      // Find order
+      // ----------------------------------
 
       const order =
         orders.find(
@@ -416,6 +341,10 @@ app.patch(
 
       }
 
+
+      // ----------------------------------
+      // Allowed statuses
+      // ----------------------------------
 
       const allowedStatuses = [
         "NEW",
@@ -441,14 +370,15 @@ app.patch(
       }
 
 
-      order.status = status;
+      // ----------------------------------
+      // Update status
+      // ----------------------------------
+
+      order.status =
+        status;
 
       order.updatedAt =
         new Date().toISOString();
-
-
-      // SAVE STATUS CHANGE
-      saveOrders();
 
 
       console.log(
@@ -456,8 +386,7 @@ app.patch(
       );
 
 
-      res.json(order);
-
+      return res.json(order);
 
     } catch (error) {
 
@@ -466,7 +395,7 @@ app.patch(
         error
       );
 
-      res.status(500).json({
+      return res.status(500).json({
         error: "Failed to update order"
       });
 
@@ -494,16 +423,7 @@ app.get("*", (req, res) => {
 
 
 // ========================================
-// START SERVER
+// VERCEL EXPORT
 // ========================================
 
-app.listen(
-  PORT,
-  () => {
-
-    console.log(
-      `QR Food running at http://localhost:${PORT}`
-    );
-
-  }
-);
+module.exports = app;
